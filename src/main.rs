@@ -93,5 +93,6 @@ fn cli_handle_new_project() -> Result<()> {
 fn cli_handle_project(config: CommonProjectConfig) -> Result<()> {
     if let Some(theme) = config.to_theme() {}
     if let Some(blog) = config.to_blog() {}
+    println!("{:#?}", config);
     Ok(())
 }

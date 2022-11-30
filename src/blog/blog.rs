@@ -1,10 +1,15 @@
-use std::{borrow::Cow, fs::create_dir_all, path::Path};
+use std::{
+    borrow::Cow,
+    fs::create_dir_all,
+    path::{Path, PathBuf},
+};
 
 use anyhow::Result;
 
 use crate::{
     config::{BlogConfig, BlogMetadataConfig, CommonProjectConfig, ThemeConfig},
-    traits::TrySaveConfig, theme::Theme,
+    theme::{Theme, ThemeSource},
+    traits::TrySaveConfig,
 };
 
 #[derive(Debug)]
@@ -55,6 +60,7 @@ impl Blog {
                 title: name.to_string(),
                 ..Default::default()
             },
+            theme_source: ThemeSource::default_local(),
             ..Default::default()
         };
 

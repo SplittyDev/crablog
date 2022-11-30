@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{blog::Blog, theme::Theme};
+use crate::{
+    blog::Blog,
+    theme::{Theme, ThemeSource},
+};
 
 pub const CONFIG_FILENAME: &str = "Crablog.toml";
 
@@ -54,6 +57,9 @@ impl From<(BlogConfig, ThemeConfig)> for CommonProjectConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BlogConfig {
     pub name: String,
+    #[serde(rename = "theme")]
+    #[serde(flatten)]
+    pub theme_source: ThemeSource,
     #[serde(rename = "metadata")]
     pub meta: BlogMetadataConfig,
 }
@@ -63,6 +69,7 @@ impl Default for BlogConfig {
         Self {
             name: "My blog".into(),
             meta: Default::default(),
+            theme_source: Default::default(),
         }
     }
 }
@@ -78,12 +85,14 @@ pub struct BlogMetadataConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ThemeConfig {
     pub name: String,
+    pub author: Option<String>,
 }
 
 impl Default for ThemeConfig {
     fn default() -> Self {
         Self {
             name: "My theme".into(),
+            author: Some("".into()),
         }
     }
 }
