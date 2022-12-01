@@ -1,8 +1,4 @@
-use std::{
-    borrow::Cow,
-    fs::create_dir_all,
-    path::{Path, PathBuf},
-};
+use std::{borrow::Cow, fs::create_dir_all, path::Path};
 
 use anyhow::Result;
 
@@ -21,7 +17,10 @@ impl Blog {
     pub fn from_config(config: BlogConfig) -> Self {
         Self { config }
     }
+}
 
+// Scaffolding
+impl Blog {
     fn scaffold_directory_structure(path: impl AsRef<Path>) -> Result<()> {
         let path = path.as_ref();
 
