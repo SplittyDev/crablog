@@ -1,13 +1,12 @@
 use std::{borrow::Cow, fs::write, path::Path};
 
-use anyhow::Result;
 use serde::Serialize;
 
-use crate::config::CONFIG_FILENAME;
+use crate::config::{CONFIG_FILENAME, ConfigError};
 
 pub trait TrySaveConfig {
     /// Try to write the config file to the current directory.
-    fn try_save(&self) -> Result<()>
+    fn try_save(&self) -> Result<(), ConfigError>
     where
         Self: Serialize,
     {
@@ -18,7 +17,7 @@ pub trait TrySaveConfig {
     }
 
     /// Try to write the config file to the specified directory.
-    fn try_save_to(&self, path: Cow<Path>) -> Result<()>
+    fn try_save_to(&self, path: Cow<Path>) -> Result<(), ConfigError>
     where
         Self: Serialize,
     {

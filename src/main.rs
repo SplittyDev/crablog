@@ -10,7 +10,7 @@ mod config;
 mod theme;
 mod traits;
 
-use config::CommonProjectConfig;
+use config::{CommonProjectConfig, ConfigError};
 use traits::TryLoadConfig;
 
 use crate::theme::Theme;
@@ -20,9 +20,17 @@ struct Args {}
 
 fn main() -> Result<()> {
     // Try to load config
-    match CommonProjectConfig::try_load().ok() {
-        None => cli_handle_new_project()?,
-        Some(config) => cli_handle_project(config)?,
+    match CommonProjectConfig::try_load() {
+        Ok(config) => cli_handle_project(config)?,
+        Err(error) => {
+            match error {
+                ConfigError::TomlDeserializationError(_) => {
+                    println!("Your Crablog.toml seems to be broken.");
+                    println!("{:#?}", error);
+                },
+                _ => cli_handle_new_project()?,
+            }
+        },
     }
 
     Ok(())

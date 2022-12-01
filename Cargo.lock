@@ -227,6 +227,7 @@ dependencies = [
  "regex",
  "serde",
  "strum",
+ "thiserror",
  "toml",
 ]
 

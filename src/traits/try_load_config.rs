@@ -1,13 +1,12 @@
 use std::{fs::read_to_string, path::Path};
 
-use anyhow::Result;
 use serde::Deserialize;
 
-use crate::config::CONFIG_FILENAME;
+use crate::config::{CONFIG_FILENAME, ConfigError};
 
 pub trait TryLoadConfig {
     /// Try to read the config file in the current directory.
-    fn try_load() -> Result<Self>
+    fn try_load() -> Result<Self, ConfigError>
     where
         Self: Sized + for<'a> Deserialize<'a>,
     {
