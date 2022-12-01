@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Configuration for a theme project.
 #[derive(Debug, Clone, Serialize, Deserialize)]

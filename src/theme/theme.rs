@@ -4,14 +4,20 @@ use anyhow::Result;
 
 use crate::config::ThemeConfig;
 
+use super::ThemeBundle;
+
 #[derive(Debug)]
 pub struct Theme {
     config: ThemeConfig,
+    bundle: ThemeBundle,
 }
 
 impl Theme {
-    pub fn from_config(config: ThemeConfig) -> Self {
-        Self { config }
+    pub fn from_config(config: ThemeConfig) -> Result<Self> {
+        Ok(Self {
+            config,
+            bundle: ThemeBundle::load_local()?,
+        })
     }
 
     pub fn scaffold_directory_structure(path: impl AsRef<Path>) -> Result<()> {

@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use super::{BlogConfig, ThemeConfig};
 use crate::{Blog, Theme};
@@ -18,7 +18,9 @@ impl CommonProjectConfig {
     }
 
     pub fn to_theme(&self) -> Option<Theme> {
-        self.theme_config.clone().map(Theme::from_config)
+        self.theme_config
+            .clone()
+            .and_then(|config| Theme::from_config(config).ok())
     }
 }
 

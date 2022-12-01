@@ -2,7 +2,7 @@ use std::{borrow::Cow, fs::write, path::Path};
 
 use serde::Serialize;
 
-use crate::config::{CONFIG_FILENAME, ConfigError};
+use crate::config::{ConfigError, CONFIG_FILENAME};
 
 pub trait TrySaveConfig {
     /// Try to write the config file to the current directory.

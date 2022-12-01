@@ -2,7 +2,7 @@ use std::{fs::read_to_string, path::Path};
 
 use serde::Deserialize;
 
-use crate::config::{CONFIG_FILENAME, ConfigError};
+use crate::config::{ConfigError, CONFIG_FILENAME};
 
 pub trait TryLoadConfig {
     /// Try to read the config file in the current directory.
