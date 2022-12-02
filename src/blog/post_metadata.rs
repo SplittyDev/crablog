@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Display};
+use std::collections::HashMap;
 
 use chrono::{Local, NaiveDateTime};
 use once_cell::sync::Lazy;

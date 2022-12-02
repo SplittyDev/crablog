@@ -1,5 +1,9 @@
 use anyhow::Result;
-use std::{fs::read_to_string, path::PathBuf};
+use std::{
+    borrow::Cow,
+    fs::read_to_string,
+    path::{Path, PathBuf},
+};
 
 use crate::traits::TryFromFile;
 
@@ -10,11 +14,14 @@ pub struct ThemeScript {
 }
 
 impl TryFromFile for ThemeScript {
-    fn try_from_file(path: PathBuf) -> Result<Self>
+    fn try_from_file(path: Cow<Path>) -> Result<Self>
     where
         Self: Sized,
     {
         let source = read_to_string(&path)?;
-        Ok(Self { path, source })
+        Ok(Self {
+            path: path.into(),
+            source,
+        })
     }
 }

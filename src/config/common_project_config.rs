@@ -22,7 +22,9 @@ impl CommonProjectConfig {
     }
 
     pub fn to_blog(&self) -> Option<Blog> {
-        self.blog_config.clone().map(Blog::from_config)
+        self.blog_config
+            .clone()
+            .and_then(|config| Blog::from_config(config).ok())
     }
 
     pub fn to_theme(&self) -> Option<Theme> {

@@ -1,21 +1,37 @@
 use std::{borrow::Cow, fs::create_dir_all, path::Path};
 
 use anyhow::Result;
+use walkdir::WalkDir;
 
 use crate::{
     config::{BlogConfig, BlogMetadataConfig, CommonProjectConfig, ThemeConfig},
     theme::{Theme, ThemeSource},
-    traits::TrySaveConfig,
+    traits::{TryFromFile, TrySaveConfig},
 };
+
+use super::Post;
 
 #[derive(Debug)]
 pub struct Blog {
     config: BlogConfig,
+    posts: Vec<Post>,
 }
 
 impl Blog {
-    pub fn from_config(config: BlogConfig) -> Self {
-        Self { config }
+    pub fn from_config(config: BlogConfig) -> Result<Self> {
+        let post_path = Path::new("./posts");
+        log::debug!("Loading posts from {:?}", post_path);
+        let posts = Self::load_posts("posts");
+        Ok(Self { config, posts })
+    }
+
+    fn load_posts(path: impl AsRef<Path>) -> Vec<Post> {
+        WalkDir::new(path)
+            .into_iter()
+            .filter_map(Result::ok)
+            .filter(|entry| entry.file_type().is_file())
+            .filter_map(|entry| Post::try_from_file(entry.into_path().into()).ok())
+            .collect()
     }
 }
 
