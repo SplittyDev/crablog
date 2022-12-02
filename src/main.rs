@@ -1,20 +1,21 @@
-use std::fmt::Display;
-
-use anyhow::{Context, Result};
-use blog::Blog;
-use clap::Parser;
-use strum::IntoEnumIterator;
-
 mod blog;
 mod config;
 mod engine;
 mod theme;
 mod traits;
 
-use config::{CommonProjectConfig, ConfigError};
-use traits::TryLoadConfig;
+use anyhow::{Context, Result};
+use clap::Parser;
+use std::fmt::Display;
+use strum::IntoEnumIterator;
 
-use crate::theme::Theme;
+use crate::{
+    blog::Blog,
+    config::{CommonProjectConfig, ConfigError},
+    engine::{BuildEngine, BuildEnvironment},
+    theme::Theme,
+    traits::TryLoadConfig,
+};
 
 #[derive(Debug, Parser)]
 struct Args {}
@@ -109,8 +110,9 @@ fn cli_handle_new_project() -> Result<()> {
 
 fn cli_handle_project(config: CommonProjectConfig) -> Result<()> {
     log::debug!("Blog config present: {:?}", config.has_blog());
-    log::debug!("Theme config present: {:?}", config.has_theme());
-    if let Some(theme) = config.to_theme() {}
-    if let Some(blog) = config.to_blog() {}
+    if let Some(blog) = config.to_blog() {
+        let mut engine = BuildEngine::new(BuildEnvironment::Production, blog);
+        engine.build()?;
+    }
     Ok(())
 }

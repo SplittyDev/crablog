@@ -20,6 +20,10 @@ pub struct Post {
 }
 
 impl Post {
+    pub fn metadata(&self) -> &PostMetadata {
+        &self.metadata
+    }
+
     #[cfg(test)]
     pub fn from_markdown_file_without_path(source: impl AsRef<str>) -> Result<Self> {
         let path = Path::new("/tmp/fake.md");

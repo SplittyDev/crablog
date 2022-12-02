@@ -5,8 +5,8 @@ use walkdir::WalkDir;
 
 use crate::{
     config::{BlogConfig, BlogMetadataConfig, CommonProjectConfig, ThemeConfig},
-    theme::{Theme, ThemeSource},
-    traits::{TryFromFile, TrySaveConfig},
+    theme::{Theme, ThemeBundle, ThemeSource},
+    traits::{ToThemeBundle, TryFromFile, TrySaveConfig},
 };
 
 use super::Post;
@@ -14,15 +14,22 @@ use super::Post;
 #[derive(Debug)]
 pub struct Blog {
     config: BlogConfig,
+    theme_bundle: ThemeBundle,
     posts: Vec<Post>,
 }
 
 impl Blog {
     pub fn from_config(config: BlogConfig) -> Result<Self> {
+        log::debug!("Loading theme");
+        let theme_bundle = config.theme_source.to_theme_bundle()?;
         let post_path = Path::new("./posts");
         log::debug!("Loading posts from {:?}", post_path);
         let posts = Self::load_posts("posts");
-        Ok(Self { config, posts })
+        Ok(Self {
+            config,
+            theme_bundle,
+            posts,
+        })
     }
 
     fn load_posts(path: impl AsRef<Path>) -> Vec<Post> {
@@ -32,6 +39,14 @@ impl Blog {
             .filter(|entry| entry.file_type().is_file())
             .filter_map(|entry| Post::try_from_file(entry.into_path().into()).ok())
             .collect()
+    }
+
+    pub fn iter_posts(&self) -> impl Iterator<Item = &Post> {
+        self.posts.iter()
+    }
+
+    pub fn theme_bundle(&self) -> &ThemeBundle {
+        &self.theme_bundle
     }
 }
 

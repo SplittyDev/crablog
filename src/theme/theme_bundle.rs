@@ -1,11 +1,11 @@
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use walkdir::WalkDir;
 
 use crate::traits::TryFromFile;
 
-use super::{ThemeAsset, ThemeLayout, ThemeScript, ThemeStyle};
+use super::{theme_layout::LayoutKind, ThemeAsset, ThemeLayout, ThemeScript, ThemeStyle};
 
 const EXT_LAYOUTS: [&str; 3] = ["html", "hbs", "handlebars"];
 const EXT_SCRIPTS: [&str; 1] = ["js"];
@@ -22,6 +22,20 @@ pub struct ThemeBundle {
 impl ThemeBundle {
     pub fn load_local() -> Result<Self> {
         Self::load_from_path(".")
+    }
+
+    pub fn index_layout(&self) -> Result<&ThemeLayout> {
+        self.layouts
+            .iter()
+            .find(|layout| layout.kind == LayoutKind::Index)
+            .context("Unable to find index layout")
+    }
+
+    pub fn post_layout(&self) -> Result<&ThemeLayout> {
+        self.layouts
+            .iter()
+            .find(|layout| layout.kind == LayoutKind::Post)
+            .context("Unable to find post layout")
     }
 
     pub fn load_from_path(path: impl AsRef<Path>) -> Result<Self> {
