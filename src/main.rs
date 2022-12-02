@@ -7,6 +7,7 @@ use strum::IntoEnumIterator;
 
 mod blog;
 mod config;
+mod engine;
 mod theme;
 mod traits;
 
@@ -19,15 +20,25 @@ use crate::theme::Theme;
 struct Args {}
 
 fn main() -> Result<()> {
+    env_logger::init();
+
     // Try to load config
+    log::debug!("Detecting presence of Crablog.toml");
     match CommonProjectConfig::try_load() {
-        Ok(config) => cli_handle_project(config)?,
+        Ok(config) => {
+            log::debug!("Configuration file is present and valid");
+            cli_handle_project(config)?
+        }
         Err(error) => match error {
             ConfigError::TomlDeserializationError(_) => {
+                log::error!("Found malformed config: {:#?}", error);
                 println!("Your Crablog.toml seems to be broken.");
                 println!("{:#?}", error);
             }
-            _ => cli_handle_new_project()?,
+            _ => {
+                log::debug!("Configuration file not found");
+                cli_handle_new_project()?
+            }
         },
     }
 
@@ -48,7 +59,7 @@ impl Display for NewProjectSelection {
             Self::Blog => "New Blog",
             Self::Theme => "New Theme",
             Self::BlogAndTheme => "New Blog with custom Theme",
-            Self::Quit => "Quit",
+            Self::Quit => "Nevermind",
         };
         write!(f, "{display_name}")
     }
@@ -97,8 +108,9 @@ fn cli_handle_new_project() -> Result<()> {
 }
 
 fn cli_handle_project(config: CommonProjectConfig) -> Result<()> {
+    log::debug!("Blog config present: {:?}", config.has_blog());
+    log::debug!("Theme config present: {:?}", config.has_theme());
     if let Some(theme) = config.to_theme() {}
     if let Some(blog) = config.to_blog() {}
-    println!("{:#?}", config);
     Ok(())
 }

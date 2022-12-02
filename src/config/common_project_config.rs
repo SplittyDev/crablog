@@ -13,6 +13,14 @@ pub struct CommonProjectConfig {
 }
 
 impl CommonProjectConfig {
+    pub fn has_blog(&self) -> bool {
+        self.blog_config.is_some()
+    }
+
+    pub fn has_theme(&self) -> bool {
+        self.theme_config.is_some()
+    }
+
     pub fn to_blog(&self) -> Option<Blog> {
         self.blog_config.clone().map(Blog::from_config)
     }

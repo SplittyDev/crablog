@@ -11,6 +11,7 @@ pub trait TryLoadConfig {
         Self: Sized + for<'a> Deserialize<'a>,
     {
         let path = Path::new(CONFIG_FILENAME);
+        log::debug!("Loading config from {:?}", path);
         let content = read_to_string(path)?;
         let config = toml::from_str::<Self>(&content)?;
         Ok(config)

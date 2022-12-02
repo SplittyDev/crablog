@@ -10,7 +10,8 @@ pub trait TrySaveConfig {
     where
         Self: Serialize,
     {
-        let path = Path::new(CONFIG_FILENAME).canonicalize()?;
+        let path = Path::new(CONFIG_FILENAME);
+        log::debug!("Saving config to {:?}", path);
         let toml = toml::to_string_pretty(self)?;
         write(path, toml)?;
         Ok(())
@@ -25,6 +26,7 @@ pub trait TrySaveConfig {
             .ends_with(CONFIG_FILENAME)
             .then(|| path.to_path_buf())
             .unwrap_or_else(|| path.join(CONFIG_FILENAME));
+        log::debug!("Saving config to {:?}", path);
         let toml = toml::to_string_pretty(self)?;
         write(path, toml)?;
         Ok(())

@@ -21,10 +21,14 @@ pub struct ThemeBundle {
 
 impl ThemeBundle {
     pub fn load_local() -> Result<Self> {
-        let local_path = Path::new(".");
-        let layouts = Self::load(local_path, "layouts", &EXT_LAYOUTS);
-        let scripts = Self::load(local_path, "scripts", &EXT_SCRIPTS);
-        let styles = Self::load(local_path, "styles", &EXT_STYLES);
+        Self::load_from_path(".")
+    }
+
+    pub fn load_from_path(path: impl AsRef<Path>) -> Result<Self> {
+        log::debug!("Loading theme bundle from {:?}", path.as_ref());
+        let layouts = Self::load(&path, "layouts", &EXT_LAYOUTS);
+        let scripts = Self::load(&path, "scripts", &EXT_SCRIPTS);
+        let styles = Self::load(&path, "styles", &EXT_STYLES);
         Ok(Self {
             layouts,
             scripts,

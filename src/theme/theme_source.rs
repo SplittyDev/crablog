@@ -1,6 +1,10 @@
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-use serde::{Deserialize, Serialize};
+use crate::traits::ToThemeBundle;
+
+use super::ThemeBundle;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -25,6 +29,15 @@ impl ThemeSource {
             source: LocalThemeSource {
                 path: PathBuf::from("."),
             },
+        }
+    }
+}
+
+impl ToThemeBundle for ThemeSource {
+    fn to_theme_bundle(&self) -> Result<ThemeBundle> {
+        match self {
+            Self::Local { source } => source.to_theme_bundle(),
+            _ => todo!(),
         }
     }
 }
@@ -63,4 +76,10 @@ pub struct GitThemeSource {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocalThemeSource {
     path: PathBuf,
+}
+
+impl ToThemeBundle for LocalThemeSource {
+    fn to_theme_bundle(&self) -> Result<super::ThemeBundle> {
+        ThemeBundle::load_from_path(&self.path)
+    }
 }
