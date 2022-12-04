@@ -4,14 +4,18 @@ use super::PageMetaData;
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct BaseDataBuilder {
+    base_url: String,
     #[serde(rename = "meta")]
     metadata: Option<PageMetaData>,
     content: Option<String>,
 }
 
 impl BaseDataBuilder {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(base_url: String) -> Self {
+        Self {
+            base_url,
+            ..Default::default()
+        }
     }
 
     pub fn with_metadata(mut self, metadata: PageMetaData) -> Self {

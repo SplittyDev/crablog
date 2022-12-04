@@ -17,8 +17,8 @@ pub struct BlogConfig {
 impl BlogConfig {
     pub fn base_url(&self, env: BuildEnvironment) -> String {
         let local_base_url = std::env::current_dir()
-            .map(|path| path.to_string_lossy().to_string())
-            .unwrap_or_else(|_| ".".to_string());
+            .map(|path| path.join("build").to_string_lossy().to_string())
+            .unwrap_or_else(|_| "./build".to_string());
         match env {
             BuildEnvironment::Development => local_base_url,
             BuildEnvironment::Production => {

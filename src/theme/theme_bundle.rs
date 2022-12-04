@@ -31,6 +31,14 @@ impl ThemeBundle {
             .context("Unable to find index layout")
     }
 
+    pub fn get_styles(&self) -> &Vec<ThemeStyle> {
+        &self.styles
+    }
+
+    pub fn get_scripts(&self) -> &Vec<ThemeScript> {
+        &self.scripts
+    }
+
     pub fn load_from_path(path: impl AsRef<Path>) -> Result<Self> {
         log::debug!("Loading theme bundle from {:?}", path.as_ref());
         let layouts = Self::load(&path, "layouts", &EXT_LAYOUTS);

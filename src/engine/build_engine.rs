@@ -31,9 +31,9 @@ impl BuildEngine {
 
     pub fn build(&mut self) -> Result<()> {
         let start_time = Instant::now();
-        log::info!("Building blog");
         self.build_index()?;
         self.build_posts()?;
+        self.build_resources()?;
         log::debug!("Writing build output to disk");
         self.write_to_disk()?;
         log::debug!(
@@ -44,6 +44,8 @@ impl BuildEngine {
     }
 
     fn build_index(&mut self) -> Result<()> {
+        log::debug!("Building index");
+
         let output = {
             // Get layouts
             let theme = self.blog.theme_bundle();
@@ -58,10 +60,12 @@ impl BuildEngine {
                 .collect::<Vec<_>>();
 
             // Build templating data
-            let base_data =
-                BaseDataBuilder::new().with_metadata(self.blog.config().meta.clone().into());
-            let index_page_data = IndexPageData { posts };
+            let base_url = self.blog.config().base_url(self.env);
+            let base_data = BaseDataBuilder::new(base_url.clone())
+                .with_metadata(self.blog.config().meta.clone().into());
+            let index_page_data = IndexPageData { base_url, posts };
 
+            // Render templates
             let renderer = Renderer::new(self.env, base_layout);
             renderer.render_index_page(&index_layout.source, base_data, &index_page_data)?
         };
@@ -80,6 +84,7 @@ impl BuildEngine {
         let base_layout = theme.get_layout(LayoutKind::Base)?;
         let post_layout = theme.get_layout(LayoutKind::Post)?;
         let renderer = Renderer::new(self.env, base_layout);
+        let base_url = self.blog.config().base_url(self.env);
 
         for post in self.blog.iter_posts() {
             log::debug!("Building post: {}", post.safe_name());
@@ -89,10 +94,11 @@ impl BuildEngine {
             };
 
             // Build data for handlebars rendering
-            let base_data =
-                BaseDataBuilder::new().with_metadata(self.blog.config().meta.clone().into());
+            let base_data = BaseDataBuilder::new(base_url.clone())
+                .with_metadata(self.blog.config().meta.clone().into());
             let post_data = PostData::try_from(post)?;
             let post_page_data = PostPageData {
+                base_url: base_url.clone(),
                 post: Some(post_data),
             };
 
@@ -103,6 +109,28 @@ impl BuildEngine {
             // Push build output
             let build_file = BuildFile::new(virtual_path.into(), output.into());
             self.build_files.push(build_file);
+        }
+
+        Ok(())
+    }
+
+    fn build_resources(&mut self) -> Result<()> {
+        let theme_bundle = self.blog.theme_bundle();
+
+        log::debug!("Building style resources");
+        for style in theme_bundle.get_styles() {
+            self.build_files.push(BuildFile::new(
+                Path::new(style.file_name()?.as_str()).into(),
+                style.source().into(),
+            ));
+        }
+
+        log::debug!("Building script resources");
+        for script in theme_bundle.get_scripts() {
+            self.build_files.push(BuildFile::new(
+                Path::new(script.file_name()?.as_str()).into(),
+                script.source().into(),
+            ));
         }
 
         Ok(())

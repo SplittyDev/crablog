@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::{
     borrow::Cow,
     fs::read_to_string,
@@ -11,6 +11,19 @@ use crate::traits::TryFromFile;
 pub struct ThemeScript {
     path: PathBuf,
     source: String,
+}
+
+impl ThemeScript {
+    pub fn file_name(&self) -> Result<String> {
+        self.path
+            .file_name()
+            .map(|s| s.to_string_lossy().to_string())
+            .context("Unable to get filename")
+    }
+
+    pub fn source(&self) -> &str {
+        &self.source
+    }
 }
 
 impl TryFromFile for ThemeScript {

@@ -36,14 +36,7 @@ impl<'a> Renderer<'a> {
             handlebars.render_template(self.base_layout.source.as_ref(), &base_data)?;
 
         // Minify if production build
-        Ok(match self.env {
-            BuildEnvironment::Production => {
-                let cfg = minify_html::Cfg::spec_compliant();
-                let minified_bytes = minify_html::minify(rendered_html.as_bytes(), &cfg);
-                String::from_utf8(minified_bytes)?
-            }
-            _ => rendered_html,
-        })
+        self.postprocess_html(rendered_html)
     }
 
     pub fn render_post_page(
@@ -63,13 +56,21 @@ impl<'a> Renderer<'a> {
             handlebars.render_template(self.base_layout.source.as_ref(), &base_data)?;
 
         // Minify if production build
+        self.postprocess_html(rendered_html)
+    }
+
+    fn postprocess_html(&self, html: String) -> Result<String> {
         Ok(match self.env {
             BuildEnvironment::Production => {
                 let cfg = minify_html::Cfg::spec_compliant();
-                let minified_bytes = minify_html::minify(rendered_html.as_bytes(), &cfg);
+                let minified_bytes = minify_html::minify(html.as_bytes(), &cfg);
                 String::from_utf8(minified_bytes)?
             }
-            _ => rendered_html,
+            _ => html
+                .lines()
+                .filter(|&line| !line.trim().is_empty())
+                .collect::<Vec<_>>()
+                .join("\n"),
         })
     }
 }

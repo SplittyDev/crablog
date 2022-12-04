@@ -5,7 +5,7 @@ mod logging;
 mod theme;
 mod traits;
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use clap::{Parser, Subcommand};
 use std::fmt::Display;
 use strum::IntoEnumIterator;
@@ -20,8 +20,11 @@ use crate::{
 
 #[derive(Debug, Subcommand)]
 enum Command {
+    /// Create a new project
     New,
+    /// Build for development
     Dev,
+    /// Build for production
     Build,
 }
 
@@ -37,24 +40,17 @@ fn main() -> Result<()> {
     // Setup logging
     logging::init()?;
 
-    // Try to load config
-    log::debug!("Detecting presence of Crablog.toml");
-    match CommonProjectConfig::try_load() {
-        Ok(config) => {
-            log::debug!("Configuration file is present and valid");
-            cli_handle_project(config)?
+    let args = Args::parse();
+    match args.command {
+        Command::New => create_new_project()?,
+        Command::Dev => {
+            let config = load_config()?;
+            build_development(config)?
         }
-        Err(error) => match error {
-            ConfigError::TomlDeserializationError(error) => {
-                log::error!("Found malformed config");
-                println!("Your Crablog.toml seems to be broken.");
-                println!("Reason: {:#}", error);
-            }
-            _ => {
-                log::debug!("Configuration file not found");
-                cli_handle_new_project()?
-            }
-        },
+        Command::Build => {
+            let config = load_config()?;
+            build_production(config)?
+        }
     }
 
     Ok(())
@@ -80,9 +76,32 @@ impl Display for NewProjectSelection {
     }
 }
 
-fn cli_handle_new_project() -> Result<()> {
-    println!("We couldn't find an existing project. Let's create one!");
+fn load_config() -> Result<CommonProjectConfig> {
+    log::debug!("Loading configuration from Crablog.toml");
+    match CommonProjectConfig::try_load() {
+        Ok(config) => {
+            log::debug!("Configuration file is present and valid");
+            Ok(config)
+        }
+        Err(error) => match error {
+            ConfigError::TomlDeserializationError(error) => {
+                log::error!("Found malformed config");
+                Err(anyhow!(
+                    "Unable to parse configuration file.\nReason: {:#}",
+                    error
+                ))
+            }
+            _ => {
+                log::debug!("Configuration file not found");
+                Err(anyhow!(
+                    "Configuration file not found. Are you in the right directory?"
+                ))
+            }
+        },
+    }
+}
 
+fn create_new_project() -> Result<()> {
     // Ask user for project kind
     let project_kind = {
         let project_kinds = NewProjectSelection::iter().collect::<Vec<_>>();
@@ -122,7 +141,15 @@ fn cli_handle_new_project() -> Result<()> {
     Ok(())
 }
 
-fn cli_handle_project(config: CommonProjectConfig) -> Result<()> {
+fn build_development(config: CommonProjectConfig) -> Result<()> {
+    if let Some(blog) = config.to_blog() {
+        let mut engine = BuildEngine::new(BuildEnvironment::Development, blog);
+        engine.build()?;
+    }
+    Ok(())
+}
+
+fn build_production(config: CommonProjectConfig) -> Result<()> {
     if let Some(blog) = config.to_blog() {
         let mut engine = BuildEngine::new(BuildEnvironment::Production, blog);
         engine.build()?;
