@@ -45,6 +45,10 @@ impl Blog {
         self.posts.iter()
     }
 
+    pub fn config(&self) -> &BlogConfig {
+        &self.config
+    }
+
     pub fn theme_bundle(&self) -> &ThemeBundle {
         &self.theme_bundle
     }

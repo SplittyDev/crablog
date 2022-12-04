@@ -10,6 +10,7 @@ pub struct PostData {
     created_at: NaiveDateTime,
     published: bool,
     html: String,
+    relative_url: String,
 }
 
 impl TryFrom<&Post> for PostData {
@@ -22,6 +23,7 @@ impl TryFrom<&Post> for PostData {
             title: metadata.title.clone(),
             created_at: metadata.created_at,
             published: metadata.published,
+            relative_url: format!("posts/{}.html", post.safe_name()),
             html,
         })
     }

@@ -24,18 +24,11 @@ impl ThemeBundle {
         Self::load_from_path(".")
     }
 
-    pub fn index_layout(&self) -> Result<&ThemeLayout> {
+    pub fn get_layout(&self, kind: LayoutKind) -> Result<&ThemeLayout> {
         self.layouts
             .iter()
-            .find(|layout| layout.kind == LayoutKind::Index)
+            .find(|layout| layout.kind == kind)
             .context("Unable to find index layout")
-    }
-
-    pub fn post_layout(&self) -> Result<&ThemeLayout> {
-        self.layouts
-            .iter()
-            .find(|layout| layout.kind == LayoutKind::Post)
-            .context("Unable to find post layout")
     }
 
     pub fn load_from_path(path: impl AsRef<Path>) -> Result<Self> {

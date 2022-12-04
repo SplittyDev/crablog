@@ -7,8 +7,9 @@ use std::{
 
 use crate::traits::TryFromFile;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LayoutKind {
+    Base,
     Index,
     Post,
 }
@@ -23,6 +24,7 @@ impl LayoutKind {
             .context("Unable to obtain file name for layout")?;
 
         Ok(match file_name_without_extension.as_str() {
+            "_base" | "base" => Self::Base,
             "index" => Self::Index,
             "post" => Self::Post,
             _ => bail!("Unknown file name. Must match one of ['index', 'post']."),
@@ -30,7 +32,7 @@ impl LayoutKind {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ThemeLayout {
     pub path: PathBuf,
     pub source: String,

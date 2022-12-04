@@ -1,11 +1,12 @@
 mod blog;
 mod config;
 mod engine;
+mod logging;
 mod theme;
 mod traits;
 
 use anyhow::{Context, Result};
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use std::fmt::Display;
 use strum::IntoEnumIterator;
 
@@ -17,11 +18,24 @@ use crate::{
     traits::TryLoadConfig,
 };
 
+#[derive(Debug, Subcommand)]
+enum Command {
+    New,
+    Dev,
+    Build,
+}
+
 #[derive(Debug, Parser)]
-struct Args {}
+#[command(author, version, about, long_about = None)]
+#[command(propagate_version = true)]
+struct Args {
+    #[command(subcommand)]
+    command: Command,
+}
 
 fn main() -> Result<()> {
-    env_logger::init();
+    // Setup logging
+    logging::init()?;
 
     // Try to load config
     log::debug!("Detecting presence of Crablog.toml");
@@ -31,10 +45,10 @@ fn main() -> Result<()> {
             cli_handle_project(config)?
         }
         Err(error) => match error {
-            ConfigError::TomlDeserializationError(_) => {
-                log::error!("Found malformed config: {:#?}", error);
+            ConfigError::TomlDeserializationError(error) => {
+                log::error!("Found malformed config");
                 println!("Your Crablog.toml seems to be broken.");
-                println!("{:#?}", error);
+                println!("Reason: {:#}", error);
             }
             _ => {
                 log::debug!("Configuration file not found");
@@ -109,7 +123,6 @@ fn cli_handle_new_project() -> Result<()> {
 }
 
 fn cli_handle_project(config: CommonProjectConfig) -> Result<()> {
-    log::debug!("Blog config present: {:?}", config.has_blog());
     if let Some(blog) = config.to_blog() {
         let mut engine = BuildEngine::new(BuildEnvironment::Production, blog);
         engine.build()?;
