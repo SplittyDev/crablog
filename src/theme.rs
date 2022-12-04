@@ -1,3 +1,4 @@
+#[allow(clippy::module_inception)]
 mod theme;
 mod theme_asset;
 mod theme_bundle;

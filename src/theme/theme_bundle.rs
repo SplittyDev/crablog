@@ -70,7 +70,7 @@ impl ThemeBundle {
             log::debug!("Loading {} files from {path:?}", extensions);
         }
         fn path_matches_extension(path: impl AsRef<Path>, exts: &[impl AsRef<str>]) -> bool {
-            exts.into_iter().map(AsRef::as_ref).any(|ext| {
+            exts.iter().map(AsRef::as_ref).any(|ext| {
                 path.as_ref()
                     .extension()
                     .map(std::ffi::OsStr::to_string_lossy)
@@ -82,7 +82,7 @@ impl ThemeBundle {
             .into_iter()
             .filter_map(Result::ok)
             .filter(|entry| entry.file_type().is_file())
-            .filter(|entry| path_matches_extension(entry.path(), &extensions))
+            .filter(|entry| path_matches_extension(entry.path(), extensions))
             .filter_map(|entry| T::try_from_file(entry.into_path().into()).ok())
             .collect()
     }

@@ -61,13 +61,13 @@ impl BuildEngine {
 
             // Build templating data
             let base_url = self.blog.config().base_url(self.env);
-            let base_data = BaseDataBuilder::new(base_url.clone())
+            let base_data = BaseDataBuilder::new(base_url)
                 .with_metadata(self.blog.config().meta.clone().into());
-            let index_page_data = IndexPageData { base_url, posts };
+            let index_page_data = IndexPageData { posts };
 
             // Render templates
             let renderer = Renderer::new(self.env, base_layout);
-            renderer.render_index_page(&index_layout.source, base_data, &index_page_data)?
+            renderer.render_index_page(&index_layout.source, base_data, index_page_data)?
         };
 
         // Push build output
@@ -98,13 +98,12 @@ impl BuildEngine {
                 .with_metadata(self.blog.config().meta.clone().into());
             let post_data = PostData::try_from(post)?;
             let post_page_data = PostPageData {
-                base_url: base_url.clone(),
                 post: Some(post_data),
             };
 
             // Render post page
             let output =
-                renderer.render_post_page(&post_layout.source, base_data, &post_page_data)?;
+                renderer.render_post_page(&post_layout.source, base_data, post_page_data)?;
 
             // Push build output
             let build_file = BuildFile::new(virtual_path.into(), output.into());

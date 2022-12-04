@@ -1,7 +1,7 @@
 use std::{
     borrow::Cow,
     fs::read_to_string,
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 use anyhow::Result;
@@ -15,7 +15,6 @@ use super::PostMetadata;
 #[derive(Debug)]
 pub struct Post {
     metadata: PostMetadata,
-    path: PathBuf,
     source: String,
 }
 
@@ -26,24 +25,15 @@ impl Post {
 
     #[cfg(test)]
     pub fn from_markdown_file_without_path(source: impl AsRef<str>) -> Result<Self> {
-        let path = Path::new("/tmp/fake.md");
         let source = source.as_ref().trim().to_string();
         let metadata = PostMetadata::from_markdown(&source);
-        Ok(Self {
-            metadata,
-            path: path.into(),
-            source,
-        })
+        Ok(Self { metadata, source })
     }
 
     pub fn from_markdown_file(path: Cow<Path>) -> Result<Self> {
         let source = read_to_string(&path)?.trim().to_string();
         let metadata = PostMetadata::from_markdown(&source);
-        Ok(Self {
-            metadata,
-            path: path.into(),
-            source,
-        })
+        Ok(Self { metadata, source })
     }
 
     /// Render the post to html

@@ -115,7 +115,7 @@ impl Blog {
 
     pub fn scaffold(name: Cow<str>) -> Result<()> {
         // Normalize path
-        let normalized_name = name.to_lowercase().replace(&[' ', '\t', '\r', '\n'], "_");
+        let normalized_name = name.to_lowercase().replace([' ', '\t', '\r', '\n'], "_");
         let normalized_path = Path::new(&normalized_name);
 
         Self::scaffold_directory_structure(normalized_path)?;
@@ -128,7 +128,7 @@ impl Blog {
 
     pub fn scaffold_with_theme(name: Cow<str>) -> Result<()> {
         // Normalize path
-        let normalized_name = name.to_lowercase().replace(&[' ', '\t', '\r', '\n'], "_");
+        let normalized_name = name.to_lowercase().replace([' ', '\t', '\r', '\n'], "_");
         let normalized_path = Path::new(&normalized_name);
 
         Blog::scaffold_directory_structure(normalized_path)?;

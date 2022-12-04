@@ -4,7 +4,7 @@ use chrono::{Local, NaiveDateTime};
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-const RE_COMMENT: Lazy<Regex> = Lazy::new(|| {
+static RE_COMMENT: Lazy<Regex> = Lazy::new(|| {
     let re = r"(?im)^\[[/]{2}\]: # \((?P<key>.*?):\s+(?P<value>.*?)\)$";
     Regex::new(re).unwrap()
 });
@@ -43,7 +43,7 @@ impl PostMetadata {
             "created_at",
             &self.created_at.format(DT_FORMAT),
         ));
-        str.push_str(&to_markdown_comment("published", &self.published));
+        str.push_str(&to_markdown_comment("published", self.published));
         str
     }
 
@@ -57,7 +57,7 @@ impl PostMetadata {
                 RE_COMMENT.captures(line).and_then(|captures| {
                     let key = captures.name("key");
                     let value = captures.name("value");
-                    key.and_then(|key| value.and_then(|value| Some((key, value))))
+                    key.and_then(|key| value.map(|value| (key, value)))
                 })
             })
             .fold(HashMap::new(), |mut accum, (key, value)| {
