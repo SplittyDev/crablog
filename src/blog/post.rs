@@ -1,7 +1,7 @@
 use std::{borrow::Cow, fs::read_to_string, path::Path};
 
 use anyhow::Result;
-use comrak::{ComrakOptions, ComrakRenderOptions, ComrakExtensionOptions};
+use comrak::{ComrakExtensionOptions, ComrakOptions, ComrakRenderOptions};
 use minify_html::minify;
 
 use crate::traits::TryFromFile;

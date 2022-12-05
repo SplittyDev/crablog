@@ -74,8 +74,8 @@ pub struct LocalThemeSource {
 
 impl ToTheme for LocalThemeSource {
     fn to_theme(&self) -> Result<super::Theme> {
-        Ok(CommonProjectConfig::try_load_from(&self.path)?
+        CommonProjectConfig::try_load_from(&self.path)?
             .to_theme()
-            .context("Unable to load theme description from config file")?)
+            .context("Unable to load theme description from config file")
     }
 }
