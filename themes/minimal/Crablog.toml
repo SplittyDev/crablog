@@ -1,0 +1,4 @@
+[theme]
+name = 'Minimal'
+author = 'Marco Quinten'
+features = ["syntax-highlighting"]

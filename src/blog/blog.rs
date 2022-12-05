@@ -135,7 +135,11 @@ impl Blog {
         };
 
         // Convert into common config
-        let config: CommonProjectConfig = (blog_config, theme_config).into();
+        let config: CommonProjectConfig = CommonProjectConfig {
+            path: path.to_path_buf(),
+            blog_config: Some(blog_config),
+            theme_config: Some(theme_config),
+        };
 
         // Serialize config
         config.try_save_to(path.into())?;

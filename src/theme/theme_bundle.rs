@@ -20,10 +20,6 @@ pub struct ThemeBundle {
 }
 
 impl ThemeBundle {
-    pub fn load_local() -> Result<Self> {
-        Self::load_from_path(".")
-    }
-
     pub fn get_layout(&self, kind: LayoutKind) -> Result<&ThemeLayout> {
         self.layouts
             .iter()

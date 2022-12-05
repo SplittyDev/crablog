@@ -1,4 +1,8 @@
-use std::{borrow::Cow, fs::create_dir_all, path::Path};
+use std::{
+    borrow::Cow,
+    fs::create_dir_all,
+    path::{Path, PathBuf},
+};
 
 use anyhow::Result;
 
@@ -6,15 +10,18 @@ use super::{config::ThemeConfig, ThemeBundle};
 
 #[derive(Debug)]
 pub struct Theme {
+    path: PathBuf,
     config: ThemeConfig,
     bundle: ThemeBundle,
 }
 
 impl Theme {
-    pub fn from_config(config: ThemeConfig) -> Result<Self> {
+    pub fn from_config(config: ThemeConfig, path: PathBuf) -> Result<Self> {
+        let bundle = ThemeBundle::load_from_path(&path)?;
         Ok(Self {
+            path,
             config,
-            bundle: ThemeBundle::load_local()?,
+            bundle,
         })
     }
 

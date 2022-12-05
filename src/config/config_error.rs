@@ -9,4 +9,7 @@ pub enum ConfigError {
 
     #[error("TOML deserialization error: {0}")]
     TomlDeserializationError(#[from] toml::de::Error),
+
+    #[error("Unable to find parent directory of theme config")]
+    ThemeParentNotFoundError,
 }

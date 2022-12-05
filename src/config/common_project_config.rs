@@ -1,18 +1,23 @@
+use std::path::PathBuf;
+
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
 use crate::{
     blog::{config::BlogConfig, Blog},
     theme::{config::ThemeConfig, Theme},
+    traits::TryLoadConfig,
 };
 
 /// Minimal subset of valid project configuration for all project kinds.
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct CommonProjectConfig {
+    #[serde(skip)]
+    pub(crate) path: PathBuf,
     #[serde(rename = "blog")]
-    blog_config: Option<BlogConfig>,
+    pub(crate) blog_config: Option<BlogConfig>,
     #[serde(rename = "theme")]
-    theme_config: Option<ThemeConfig>,
+    pub(crate) theme_config: Option<ThemeConfig>,
 }
 
 impl CommonProjectConfig {
@@ -27,7 +32,13 @@ impl CommonProjectConfig {
         self.theme_config
             .clone()
             .context("Configuration file does not contain a theme section")
-            .and_then(Theme::from_config)
+            .and_then(|config| Theme::from_config(config, self.path.clone()))
+    }
+}
+
+impl TryLoadConfig for CommonProjectConfig {
+    fn update_path(&mut self, path: &std::path::Path) {
+        self.path = path.to_path_buf();
     }
 }
 
@@ -45,15 +56,6 @@ impl From<ThemeConfig> for CommonProjectConfig {
         Self {
             theme_config: Some(config),
             ..Default::default()
-        }
-    }
-}
-
-impl From<(BlogConfig, ThemeConfig)> for CommonProjectConfig {
-    fn from(configs: (BlogConfig, ThemeConfig)) -> Self {
-        Self {
-            blog_config: Some(configs.0),
-            theme_config: Some(configs.1),
         }
     }
 }
