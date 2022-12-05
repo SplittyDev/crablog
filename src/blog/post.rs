@@ -48,6 +48,7 @@ impl Post {
             table: true,
             autolink: true,
             footnotes: true,
+            header_ids: Some(String::default()),
             ..Default::default()
         };
         let options = ComrakOptions {
