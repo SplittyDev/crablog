@@ -1,10 +1,10 @@
 use anyhow::Result;
 use chrono::NaiveDateTime;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::blog::Post;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 pub struct PostData {
     title: String,
     created_at: NaiveDateTime,

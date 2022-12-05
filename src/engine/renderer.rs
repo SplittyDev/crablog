@@ -74,11 +74,7 @@ impl<'a> Renderer<'a> {
             }
             // Remove empty lines to get rid of artifacts from template rendering
             // and improve readability of the rendered html source.
-            _ => html
-                .lines()
-                .filter(|&line| !line.trim().is_empty())
-                .collect::<Vec<_>>()
-                .join("\n"),
+            _ => html,
         })
     }
 }

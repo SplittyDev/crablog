@@ -10,8 +10,14 @@ pub trait TryLoadConfig {
     where
         Self: Sized + for<'a> Deserialize<'a>,
     {
-        let path = Path::new(CONFIG_FILENAME);
-        log::debug!("Loading config from {:?}", path);
+        Self::try_load_from(Path::new("."))
+    }
+
+    fn try_load_from(path: impl AsRef<Path>) -> Result<Self, ConfigError>
+    where
+        Self: Sized + for<'a> Deserialize<'a>,
+    {
+        let path = path.as_ref().join(CONFIG_FILENAME);
         let content = read_to_string(path)?;
         let config = toml::from_str::<Self>(&content)?;
         Ok(config)

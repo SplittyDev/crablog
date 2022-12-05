@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct ThemeConfig {
     pub name: String,
     pub author: Option<String>,
+    pub features: Vec<String>,
 }
 
 impl Default for ThemeConfig {
@@ -12,6 +13,7 @@ impl Default for ThemeConfig {
         Self {
             name: "My theme".into(),
             author: Some("".into()),
+            features: Vec::default(),
         }
     }
 }

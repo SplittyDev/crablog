@@ -2,9 +2,7 @@ use std::{borrow::Cow, fs::create_dir_all, path::Path};
 
 use anyhow::Result;
 
-use crate::config::ThemeConfig;
-
-use super::ThemeBundle;
+use super::{config::ThemeConfig, ThemeBundle};
 
 #[derive(Debug)]
 pub struct Theme {
@@ -18,6 +16,14 @@ impl Theme {
             config,
             bundle: ThemeBundle::load_local()?,
         })
+    }
+
+    pub fn bundle(&self) -> &ThemeBundle {
+        &self.bundle
+    }
+
+    pub fn features(&self) -> Vec<String> {
+        self.config.features.clone()
     }
 
     pub fn scaffold_directory_structure(path: impl AsRef<Path>) -> Result<()> {

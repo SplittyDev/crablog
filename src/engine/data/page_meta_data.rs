@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
-use crate::config::BlogMetadataConfig;
+use crate::blog::config::BlogMetadataConfig;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 pub struct PageMetaData {
     title: String,
     description: String,

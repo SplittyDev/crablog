@@ -1,33 +1,36 @@
 use std::{borrow::Cow, fs::create_dir_all, path::Path};
 
 use anyhow::Result;
+use itertools::Itertools;
 use walkdir::WalkDir;
 
 use crate::{
-    config::{BlogConfig, BlogMetadataConfig, CommonProjectConfig, ThemeConfig},
-    theme::{Theme, ThemeBundle, ThemeSource},
-    traits::{ToThemeBundle, TryFromFile, TrySaveConfig},
+    blog::{
+        config::{BlogConfig, BlogMetadataConfig, BlogThemeConfig},
+        Post,
+    },
+    config::CommonProjectConfig,
+    theme::{config::ThemeConfig, Theme, ThemeBundle, ThemeSource},
+    traits::{ToTheme, TryFromFile, TrySaveConfig},
 };
-
-use super::Post;
 
 #[derive(Debug)]
 pub struct Blog {
     config: BlogConfig,
-    theme_bundle: ThemeBundle,
+    theme: Theme,
     posts: Vec<Post>,
 }
 
 impl Blog {
     pub fn from_config(config: BlogConfig) -> Result<Self> {
         log::debug!("Loading theme");
-        let theme_bundle = config.theme_source.to_theme_bundle()?;
+        let theme = config.theme_config.source().to_theme()?;
         let post_path = Path::new("./posts");
         log::debug!("Loading posts from {:?}", post_path);
         let posts = Self::load_posts("posts");
         Ok(Self {
             config,
-            theme_bundle,
+            theme,
             posts,
         })
     }
@@ -38,7 +41,21 @@ impl Blog {
             .filter_map(Result::ok)
             .filter(|entry| entry.file_type().is_file())
             .filter_map(|entry| Post::try_from_file(entry.into_path().into()).ok())
+            .sorted_by(|a, b| b.metadata().created_at.cmp(&a.metadata().created_at))
             .collect()
+    }
+
+    /// Get union of requested and available theme features
+    pub fn resolve_features(&self) -> Vec<String> {
+        let features_available = self.theme.features();
+        let features_requested = self.config.theme_config.features();
+        let mut vec = Vec::with_capacity(features_available.len());
+        for feature in features_available {
+            if features_requested.contains(&feature) {
+                vec.push(feature)
+            }
+        }
+        vec
     }
 
     pub fn iter_posts(&self) -> impl Iterator<Item = &Post> {
@@ -49,8 +66,12 @@ impl Blog {
         &self.config
     }
 
+    pub fn theme(&self) -> &Theme {
+        &self.theme
+    }
+
     pub fn theme_bundle(&self) -> &ThemeBundle {
-        &self.theme_bundle
+        &self.theme.bundle()
     }
 }
 
@@ -94,7 +115,10 @@ impl Blog {
                 title: name.to_string(),
                 ..Default::default()
             },
-            theme_source: ThemeSource::default_local(),
+            theme_config: BlogThemeConfig {
+                source: ThemeSource::default_local(),
+                ..Default::default()
+            },
             ..Default::default()
         };
 

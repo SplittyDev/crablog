@@ -1,26 +1,20 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-use crate::traits::ToThemeBundle;
+use crate::{
+    config::CommonProjectConfig,
+    traits::{ToTheme, TryLoadConfig},
+};
 
-use super::ThemeBundle;
+use super::Theme;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ThemeSource {
-    Crablog {
-        #[serde(flatten)]
-        source: CrablogThemeSource,
-    },
-    Git {
-        #[serde(rename = "theme")]
-        source: GitThemeSource,
-    },
-    Local {
-        #[serde(rename = "theme")]
-        source: LocalThemeSource,
-    },
+    Crablog { source: CrablogThemeSource },
+    Git { source: GitThemeSource },
+    Local { source: LocalThemeSource },
 }
 
 impl ThemeSource {
@@ -33,10 +27,10 @@ impl ThemeSource {
     }
 }
 
-impl ToThemeBundle for ThemeSource {
-    fn to_theme_bundle(&self) -> Result<ThemeBundle> {
+impl ToTheme for ThemeSource {
+    fn to_theme(&self) -> Result<Theme> {
         match self {
-            Self::Local { source } => source.to_theme_bundle(),
+            Self::Local { source } => source.to_theme(),
             _ => todo!(),
         }
     }
@@ -78,8 +72,10 @@ pub struct LocalThemeSource {
     path: PathBuf,
 }
 
-impl ToThemeBundle for LocalThemeSource {
-    fn to_theme_bundle(&self) -> Result<super::ThemeBundle> {
-        ThemeBundle::load_from_path(&self.path)
+impl ToTheme for LocalThemeSource {
+    fn to_theme(&self) -> Result<super::Theme> {
+        Ok(CommonProjectConfig::try_load_from(&self.path)?
+            .to_theme()
+            .context("Unable to load theme description from config file")?)
     }
 }

@@ -1,3 +1,4 @@
+pub mod config;
 #[allow(clippy::module_inception)]
 mod theme;
 mod theme_asset;

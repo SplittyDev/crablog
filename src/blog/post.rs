@@ -1,11 +1,7 @@
-use std::{
-    borrow::Cow,
-    fs::read_to_string,
-    path::Path,
-};
+use std::{borrow::Cow, fs::read_to_string, path::Path};
 
 use anyhow::Result;
-use comrak::{ComrakOptions, ComrakRenderOptions};
+use comrak::{ComrakOptions, ComrakRenderOptions, ComrakExtensionOptions};
 use minify_html::minify;
 
 use crate::traits::TryFromFile;
@@ -43,8 +39,15 @@ impl Post {
             unsafe_: true,
             ..Default::default()
         };
+        let extension = ComrakExtensionOptions {
+            table: true,
+            autolink: true,
+            footnotes: true,
+            ..Default::default()
+        };
         let options = ComrakOptions {
             render,
+            extension,
             ..Default::default()
         };
         let html = comrak::markdown_to_html(&self.source, &options);

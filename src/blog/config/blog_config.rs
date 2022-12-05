@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{engine::BuildEnvironment, theme::ThemeSource};
+use crate::engine::BuildEnvironment;
+
+use super::{BlogMetadataConfig, BlogThemeConfig};
 
 /// Configuration for a blog project.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -8,8 +10,7 @@ pub struct BlogConfig {
     pub name: String,
     pub base_url: Option<String>,
     #[serde(rename = "theme")]
-    #[serde(flatten)]
-    pub theme_source: ThemeSource,
+    pub theme_config: BlogThemeConfig,
     #[serde(rename = "metadata")]
     pub meta: BlogMetadataConfig,
 }
@@ -34,16 +35,7 @@ impl Default for BlogConfig {
             name: "My blog".into(),
             base_url: None,
             meta: Default::default(),
-            theme_source: Default::default(),
+            theme_config: Default::default(),
         }
     }
-}
-
-/// Configuration for blog metadata.
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct BlogMetadataConfig {
-    pub title: String,
-    pub description: String,
-    #[serde(default)]
-    pub keywords: Vec<String>,
 }

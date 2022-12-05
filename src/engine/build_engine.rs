@@ -1,6 +1,7 @@
 use std::{path::Path, time::Instant};
 
 use anyhow::Result;
+use itertools::Itertools;
 
 use crate::{
     blog::Blog,
@@ -9,6 +10,7 @@ use crate::{
         renderer::Renderer,
     },
     theme::LayoutKind,
+    traits::ToTheme,
 };
 
 use super::{build_file::BuildFile, data::IndexPageData, BuildEnvironment};
@@ -31,6 +33,18 @@ impl BuildEngine {
 
     pub fn build(&mut self) -> Result<()> {
         let start_time = Instant::now();
+        log::debug!(
+            "Features available: {}",
+            self.blog.theme().features().join(", "),
+        );
+        log::debug!("Features enabled: {}", {
+            let features = self.blog.resolve_features();
+            if features.is_empty() {
+                "<none>".to_string()
+            } else {
+                features.join(", ")
+            }
+        },);
         self.build_index()?;
         self.build_posts()?;
         self.build_resources()?;
@@ -62,7 +76,8 @@ impl BuildEngine {
             // Build templating data
             let base_url = self.blog.config().base_url(self.env);
             let base_data = BaseDataBuilder::new(base_url)
-                .with_metadata(self.blog.config().meta.clone().into());
+                .with_metadata(self.blog.config().meta.clone().into())
+                .with_features(self.blog.resolve_features());
             let index_page_data = IndexPageData { posts };
 
             // Render templates
@@ -95,7 +110,8 @@ impl BuildEngine {
 
             // Build data for handlebars rendering
             let base_data = BaseDataBuilder::new(base_url.clone())
-                .with_metadata(self.blog.config().meta.clone().into());
+                .with_metadata(self.blog.config().meta.clone().into())
+                .with_features(self.blog.resolve_features());
             let post_data = PostData::try_from(post)?;
             let post_page_data = PostPageData {
                 post: Some(post_data),

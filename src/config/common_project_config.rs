@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use super::{BlogConfig, ThemeConfig};
-use crate::{Blog, Theme};
+use crate::{
+    blog::{config::BlogConfig, Blog},
+    theme::{config::ThemeConfig, Theme},
+};
 
 /// Minimal subset of valid project configuration for all project kinds.
 #[derive(Debug, Default, Serialize, Deserialize)]
