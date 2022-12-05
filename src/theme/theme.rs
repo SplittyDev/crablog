@@ -10,7 +10,6 @@ use super::{config::ThemeConfig, ThemeBundle};
 
 #[derive(Debug)]
 pub struct Theme {
-    path: PathBuf,
     config: ThemeConfig,
     bundle: ThemeBundle,
 }
@@ -18,11 +17,7 @@ pub struct Theme {
 impl Theme {
     pub fn from_config(config: ThemeConfig, path: PathBuf) -> Result<Self> {
         let bundle = ThemeBundle::load_from_path(&path)?;
-        Ok(Self {
-            path,
-            config,
-            bundle,
-        })
+        Ok(Self { config, bundle })
     }
 
     pub fn bundle(&self) -> &ThemeBundle {

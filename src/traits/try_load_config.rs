@@ -1,6 +1,5 @@
 use std::{fs::read_to_string, path::Path};
 
-use anyhow::Context;
 use serde::Deserialize;
 
 use crate::config::{ConfigError, CONFIG_FILENAME};
@@ -21,7 +20,7 @@ pub trait TryLoadConfig {
     {
         let path = path.as_ref().join(CONFIG_FILENAME);
         let parent_path = path.parent().ok_or(ConfigError::ThemeParentNotFoundError)?;
-        let content = read_to_string(path.to_path_buf())?;
+        let content = read_to_string(&path)?;
         let mut config = toml::from_str::<Self>(&content)?;
         config.update_path(parent_path);
         Ok(config)
