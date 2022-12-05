@@ -6,6 +6,7 @@ mod theme;
 mod traits;
 
 use anyhow::{anyhow, Context, Result};
+use blog::Post;
 use clap::{Parser, Subcommand};
 use std::fmt::Display;
 use strum::IntoEnumIterator;
@@ -20,8 +21,10 @@ use crate::{
 
 #[derive(Debug, Subcommand)]
 enum Command {
-    /// Create a new project
-    New,
+    /// Initialize a new project
+    Init,
+    /// Create a new post
+    Post,
     /// Build for development
     Dev,
     /// Build for production
@@ -42,14 +45,15 @@ fn main() -> Result<()> {
 
     let args = Args::parse();
     match args.command {
-        Command::New => create_new_project()?,
+        Command::Init => create_new_project()?,
+        Command::Post => create_new_post()?,
         Command::Dev => {
             let config = load_config()?;
-            build_development(config)?
+            build(config, BuildEnvironment::Development)?
         }
         Command::Build => {
             let config = load_config()?;
-            build_production(config)?
+            build(config, BuildEnvironment::Production)?
         }
     }
 
@@ -141,18 +145,15 @@ fn create_new_project() -> Result<()> {
     Ok(())
 }
 
-fn build_development(config: CommonProjectConfig) -> Result<()> {
-    if let Some(blog) = config.to_blog() {
-        let mut engine = BuildEngine::new(BuildEnvironment::Development, blog);
-        engine.build()?;
-    }
-    Ok(())
+fn create_new_post() -> Result<()> {
+    let post_name = dialoguer::Input::<String>::new()
+        .with_prompt("Post Title")
+        .interact_text()?;
+    Post::scaffold(post_name.into())
 }
 
-fn build_production(config: CommonProjectConfig) -> Result<()> {
-    if let Some(blog) = config.to_blog() {
-        let mut engine = BuildEngine::new(BuildEnvironment::Production, blog);
-        engine.build()?;
-    }
-    Ok(())
+fn build(config: CommonProjectConfig, env: BuildEnvironment) -> Result<()> {
+    let blog = config.to_blog()?;
+    let mut engine = BuildEngine::new(env, blog);
+    engine.build()
 }

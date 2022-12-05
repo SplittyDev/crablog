@@ -8,9 +8,9 @@
 
 ## Usage
 
-| Command                    | Description                                |
-| -------------------------- | ------------------------------------------ |
-| `crablog new`              | Create a new project                       |
-| `crablog build`            | Build your existing project                |
-| `crablog dev`              | Run your existing project with live-reload |
-| `crablog create "My Post"` | Create a new blog post                     |
+| Command           | Description                                |
+| ----------------- | ------------------------------------------ |
+| `crablog init`    | Initialize a new project                   |
+| `crablog build`   | Build your existing project                |
+| `crablog dev`     | Run your existing project with live-reload |
+| `crablog post`    | Create a new blog post                     |

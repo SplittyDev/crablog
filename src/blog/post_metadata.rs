@@ -18,6 +18,16 @@ pub struct PostMetadata {
     pub created_at: NaiveDateTime,
 }
 
+impl PostMetadata {
+    pub fn safe_name(&self) -> String {
+        self.title
+            .trim()
+            .to_lowercase()
+            .replace(' ', "_")
+            .replace('/', "")
+    }
+}
+
 impl Default for PostMetadata {
     fn default() -> Self {
         Self {

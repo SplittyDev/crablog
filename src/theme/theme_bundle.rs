@@ -13,7 +13,7 @@ const EXT_STYLES: [&str; 1] = ["css"];
 
 #[derive(Debug)]
 pub struct ThemeBundle {
-    assets: Vec<ThemeAsset>,
+    _assets: Vec<ThemeAsset>,
     layouts: Vec<ThemeLayout>,
     scripts: Vec<ThemeScript>,
     styles: Vec<ThemeStyle>,
@@ -48,7 +48,7 @@ impl ThemeBundle {
             layouts,
             scripts,
             styles,
-            assets: Default::default(),
+            _assets: Default::default(),
         })
     }
 

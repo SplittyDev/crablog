@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -15,24 +16,18 @@ pub struct CommonProjectConfig {
 }
 
 impl CommonProjectConfig {
-    pub fn has_blog(&self) -> bool {
-        self.blog_config.is_some()
-    }
-
-    pub fn has_theme(&self) -> bool {
-        self.theme_config.is_some()
-    }
-
-    pub fn to_blog(&self) -> Option<Blog> {
+    pub fn to_blog(&self) -> Result<Blog> {
         self.blog_config
             .clone()
-            .and_then(|config| Blog::from_config(config).ok())
+            .context("Configuration file does not contain a blog section")
+            .and_then(Blog::from_config)
     }
 
-    pub fn to_theme(&self) -> Option<Theme> {
+    pub fn to_theme(&self) -> Result<Theme> {
         self.theme_config
             .clone()
-            .and_then(|config| Theme::from_config(config).ok())
+            .context("Configuration file does not contain a theme section")
+            .and_then(Theme::from_config)
     }
 }
 

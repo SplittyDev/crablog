@@ -10,6 +10,7 @@ use crate::{
         Post,
     },
     config::CommonProjectConfig,
+    engine::BuildEnvironment,
     theme::{config::ThemeConfig, Theme, ThemeBundle, ThemeSource},
     traits::{ToTheme, TryFromFile, TrySaveConfig},
 };
@@ -58,8 +59,13 @@ impl Blog {
         vec
     }
 
-    pub fn iter_posts(&self) -> impl Iterator<Item = &Post> {
-        self.posts.iter()
+    pub fn iter_posts(&self, env: BuildEnvironment) -> Box<dyn Iterator<Item = &Post> + '_> {
+        match env {
+            BuildEnvironment::Development => Box::new(self.posts.iter()),
+            BuildEnvironment::Production => {
+                Box::new(self.posts.iter().filter(|post| post.metadata().published))
+            }
+        }
     }
 
     pub fn config(&self) -> &BlogConfig {
@@ -71,7 +77,7 @@ impl Blog {
     }
 
     pub fn theme_bundle(&self) -> &ThemeBundle {
-        &self.theme.bundle()
+        self.theme.bundle()
     }
 }
 

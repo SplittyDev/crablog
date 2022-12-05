@@ -1,7 +1,6 @@
 use std::{path::Path, time::Instant};
 
 use anyhow::Result;
-use itertools::Itertools;
 
 use crate::{
     blog::Blog,
@@ -10,7 +9,6 @@ use crate::{
         renderer::Renderer,
     },
     theme::LayoutKind,
-    traits::ToTheme,
 };
 
 use super::{build_file::BuildFile, data::IndexPageData, BuildEnvironment};
@@ -69,7 +67,7 @@ impl BuildEngine {
             // Build post data from posts
             let posts = self
                 .blog
-                .iter_posts()
+                .iter_posts(self.env)
                 .filter_map(|post| PostData::try_from(post).ok())
                 .collect::<Vec<_>>();
 
@@ -101,7 +99,7 @@ impl BuildEngine {
         let renderer = Renderer::new(self.env, base_layout);
         let base_url = self.blog.config().base_url(self.env);
 
-        for post in self.blog.iter_posts() {
+        for post in self.blog.iter_posts(self.env) {
             log::debug!("Building post: {}", post.safe_name());
             let virtual_path = {
                 let virtual_path = format!("posts/{}.html", post.safe_name());

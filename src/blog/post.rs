@@ -1,4 +1,9 @@
-use std::{borrow::Cow, fs::read_to_string, path::Path};
+use std::{
+    borrow::Cow,
+    fs::{read_to_string, File},
+    io::Write,
+    path::Path,
+};
 
 use anyhow::Result;
 use comrak::{ComrakExtensionOptions, ComrakOptions, ComrakRenderOptions};
@@ -63,12 +68,28 @@ impl Post {
     }
 
     pub fn safe_name(&self) -> String {
-        self.metadata
-            .title
-            .trim()
-            .to_lowercase()
-            .replace(' ', "_")
-            .replace('/', "")
+        self.metadata.safe_name()
+    }
+}
+
+// Scaffolding
+impl Post {
+    pub fn scaffold(name: Cow<str>) -> Result<()> {
+        let metadata = PostMetadata {
+            title: name.to_string(),
+            ..Default::default()
+        };
+        let safe_name = metadata.safe_name();
+        log::debug!("Scaffolding post {name:?} at posts/{safe_name}.md");
+        let source = format!(
+            "{metadata}\n# {name}\nWork in progress",
+            metadata = metadata.to_markdown(),
+            name = name
+        );
+        let path = Path::new("posts").join(format!("{safe_name}.md"));
+        let mut file = File::options().write(true).create_new(true).open(path)?;
+        file.write_all(source.as_bytes())?;
+        Ok(())
     }
 }
 
