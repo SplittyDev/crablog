@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use anyhow::Result;
-use owo_colors::OwoColorize;
+use owo_colors::{AnsiColors, OwoColorize};
 
 #[cfg(debug_assertions)]
 const LOG_LEVEL: log::LevelFilter = log::LevelFilter::Debug;
@@ -13,15 +13,14 @@ struct ColoredLogLevel(log::Level);
 
 impl Display for ColoredLogLevel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self.0 {
-            level if level == log::Level::Debug => level.to_string().blue().to_string(),
-            level if level == log::Level::Error => level.to_string().red().to_string(),
-            level if level == log::Level::Warn => level.to_string().yellow().to_string(),
-            level if level == log::Level::Info => level.to_string().green().to_string(),
-            level if level == log::Level::Trace => level.to_string().bright_white().to_string(),
-            level => level.to_string(),
+        let color = match self.0 {
+            log::Level::Debug => AnsiColors::Blue,
+            log::Level::Error => AnsiColors::Red,
+            log::Level::Warn => AnsiColors::Yellow,
+            log::Level::Info => AnsiColors::Green,
+            log::Level::Trace => AnsiColors::BrightWhite,
         };
-        write!(f, "{str}")
+        write!(f, "{}", self.0.color(color))
     }
 }
 
