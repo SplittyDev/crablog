@@ -1,6 +1,8 @@
 # 🦀 Crablog
 > A lightweight static blogging solution.
 
+ℹ️ This is a work-in-progress.
+
 - Easy to setup and use
 - Blazing-fast static builds
 - Fully featured theming engine
