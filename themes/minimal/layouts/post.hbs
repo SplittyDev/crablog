@@ -1,0 +1,13 @@
+<main>
+    <article class="post">
+
+        {{!-- Table of Contents --}}
+        {{#if features.toc}}
+            <div class="toc" data-toc>
+                <div class="heading">Table of Contents</div>
+            </div>
+        {{/if}}
+
+        <div>{{{post.html}}}</div>
+    </article>
+</main>

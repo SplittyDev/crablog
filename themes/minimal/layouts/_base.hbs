@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {{!-- Additional Metadata --}}
+    {{#if meta.description}}<meta name="description" content="{{meta.description}}">{{/if}}
+    {{#if meta.keywords}}<meta name="keywords" content="{{meta.keywords}}">{{/if}}
+    <title>{{meta.title}}</title>
+
+    {{!-- Styles --}}
+    <link rel="stylesheet" type="text/css" href="{{base_url}}/base.css" />
+
+    {{!-- Table of Contents --}}
+    {{#if features.toc }}
+        <script defer src="{{base_url}}/toc.js"></script>
+    {{/if}}
+
+    {{!-- Syntax Highlighting --}}
+    {{#if features.syntax-highlighting }}
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/github-dark.min.css">
+        <script
+            defer
+            onload="hljs.highlightAll()"
+            src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js">
+        </script>
+    {{/if}}
+</head>
+<body>
+    <header>
+        <a href="{{base_url}}/index.html"><h1 class="title">{{meta.title}}</h1></a>
+        <span>{{meta.description}}</span>
+    </header>
+
+    {{{content}}}
+</body>
+</html>

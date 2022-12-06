@@ -1,0 +1,10 @@
+<main class="index">
+    <h2 class="post-list-title">Recent Posts</h2>
+    <div class="post-list">
+        {{#each posts}}
+            <div class="post-entry">
+                <a href="{{../base_url}}/{{relative_url}}">{{title}}</a>
+            </div>
+        {{/each}}
+    </div>
+</main>
